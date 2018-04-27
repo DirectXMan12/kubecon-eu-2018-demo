@@ -1,0 +1,9 @@
+rules:
+- seriesQuery: '{__name__=~".*_latency_seconds$"}'
+  resources:
+    template: "${.Resource}$"
+  name:
+    matches: "^(.*)_latency_seconds$"
+    as: "$1_latency"
+  # average latency over the past 30s, averaged by resource
+  metricsQuery: 'avg(rate(${.Series}_sum${${.LabelMatchers}$}[30s]) / rate(${.Series}_count${${.LabelMatchers}$}[30s])) by (${.GroupBy}$)'
