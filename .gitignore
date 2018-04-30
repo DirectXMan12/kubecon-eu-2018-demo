@@ -1,4 +1,4 @@
 *~
 *.swp
-/vendor
-/balancer
+/loadbalancer/vendor
+/loadbalancer/deploy/balancer

@@ -1,5 +1,5 @@
 FROM scratch
 
-COPY loadbalancer /loadbalancer
+COPY balancer /loadbalancer
 
 ENTRYPOINT ["/loadbalancer"]

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: custom-metrics-apiserver
+  name: adapter-config
+  namespace: custom-metrics
+data:
+  config.yaml: |
+    rules:
+    - seriesQuery: '{__name__=~".*_latency_seconds$"}'
+      resources:
+        template: "${.Resource}$"
+      name:
+        matches: "^(.*)_latency_seconds$"
+        as: "${1}_latency"
+      # average latency over the past 30s, averaged by resource
+      metricsQuery: 'avg(rate(${.Series}$_sum{${.LabelMatchers}$}[30s]) / rate(${.Series}$_count{${.LabelMatchers}$}[30s])) by (${.GroupBy}$)'
+    # cumulative metrics, like http_requests_total
+    - seriesQuery: '{namespace!="",__name__!="^container_.*"}'
+      name: {matches: "^(.*)_total$"}
+      resources:
+        template: "${.Resource}$"
+      metricsQuery: 'sum(rate(${.Series}${${.LabelMatchers}$,container_name!="POD"}[2m])) by (${.GroupBy}$)'
